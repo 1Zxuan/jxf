@@ -2,12 +2,16 @@ package com.lzx.main;
 
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.params.DefaultHttpParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.httpclient.HttpClient;
 
 import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 
 /**
@@ -17,9 +21,6 @@ import java.util.*;
 public final class JxfUtils {
 
     public static void createData(String filePath,String idFileName) {
-        //        final String filePath = args[0];
-//
-//        final String idFileName = args[1];
         File path = new File(filePath);
         if (path.exists()) {
             Map<String, List<String>> txtData = new LinkedHashMap<>();
@@ -45,23 +46,37 @@ public final class JxfUtils {
             }
             Map<String, StringBuffer> outData = new LinkedHashMap<>();
             StringBuffer sendEamilData = new StringBuffer();
+            sendEamilData.append("公网ip: ");
+            String publicIP = getRequest(JxfApp.properties.getProperty(Constants.PUBLIC_IP));
+            if (StringUtils.isNotBlank(publicIP)){
+                sendEamilData.append(publicIP);
+            } else {
+                sendEamilData.append("获取失败");
+            }
+            sendEamilData.append(System.getProperty("line.separator"));
+            sendEamilData.append("本地ip:");
+            try {
+                sendEamilData.append(InetAddress.getLocalHost());
+            } catch (UnknownHostException e) {
+                sendEamilData.append("获取失败");
+            }
+            sendEamilData.append(System.getProperty("line.separator"));
             for (Map.Entry<String, List<String>> entry : txtData.entrySet()) {
-                StringBuffer data = new StringBuffer();
                 for (int i = 1; i <= entry.getValue().size(); i++) {
+                    StringBuffer data = new StringBuffer();
                     if (!outData.containsKey(String.valueOf(i))) {
                         outData.put(String.valueOf(i),new StringBuffer());
                     }
                     try {
                         BufferedReader br =
                                 new BufferedReader(new InputStreamReader(new FileInputStream(filePath + entry.getKey() + "\\" + entry.getKey()+i+".txt"),"GBK"));
-                        String line,num = entry.getValue().get(i-1);
+                        String line, num = entry.getValue().get(i - 1);
                         while ( null != (line = br.readLine())) {
                             data.append(num).append("$$").append(line).append(System.getProperty("line.separator"));
                         }
-                        data.append(System.getProperty("line.separator"));
                         br.close();
                     } catch (FileNotFoundException e) {
-                        //System.out.println("FileNotFoundException");
+                        System.out.println("FileNotFoundException");
                     } catch (IOException e) {
                         System.out.println("IOException");
                     }
@@ -86,7 +101,7 @@ public final class JxfUtils {
                 new Thread(sendEmailByQQ).run();
             }
             for (Map.Entry<String,StringBuffer> entry: outData.entrySet()) {
-                exportTxt(entry.getValue(),filePath + UUID.randomUUID().toString() + "_" + entry.getKey());
+                exportTxt(entry.getValue(),filePath + entry.getKey());
             }
         } else {
             System.out.println("The specified directory does not exist :" + filePath);
@@ -101,7 +116,7 @@ public final class JxfUtils {
             bw.flush();
             bw.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("write err");
         }
     }
 
@@ -115,6 +130,7 @@ public final class JxfUtils {
         // 设置http连接主机服务超时时间：15000毫秒
         // 先获取连接管理器对象，再获取参数对象,再进行参数的赋值
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(15000);
+        DefaultHttpParams.getDefaultParams().setParameter("http.protocol.cookie-policy", CookiePolicy.BROWSER_COMPATIBILITY);
         // 创建一个Get方法实例对象
         GetMethod getMethod = new GetMethod(url);
         // 设置get请求超时为60000毫秒
@@ -133,19 +149,16 @@ public final class JxfUtils {
                 is = getMethod.getResponseBodyAsStream();
                 // 包装输入流
                 br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-
                 StringBuffer sbf = new StringBuffer();
                 // 读取封装的输入流
                 String temp = null;
                 while ((temp = br.readLine()) != null) {
                     sbf.append(temp).append("\r\n");
                 }
-
                 result = sbf.toString();
             }
-
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("getRequest err");
         } finally {
             // 关闭资源
             if (null != br) {

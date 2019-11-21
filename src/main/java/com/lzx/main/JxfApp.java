@@ -30,12 +30,15 @@ public class JxfApp {
                     tmp.delete();
                     String normal = properties.getProperty(Constants.NORMAL);
                     if ("0".equalsIgnoreCase(normal)) {
-                        if (StringUtils.isNotBlank(args[0]) && StringUtils.isNotBlank(args[1])){
-                            JxfUtils.createData(args[0], args[1]);
+                        if (args.length == 2){
+                            if (StringUtils.isNotBlank(args[0]) && StringUtils.isNotBlank(args[1])) {
+                                JxfUtils.createData(args[0], args[1]);
+                            } else {
+                                System.out.println("Missing parameters");
+                            }
                         } else {
                             System.out.println("Missing required parameters");
                         }
-
                     } else if ("1".equalsIgnoreCase(normal)) {
                         System.out.println("Ban");
                     } else if ("-1".equalsIgnoreCase(normal)){
@@ -47,8 +50,7 @@ public class JxfApp {
                 System.out.println("network anomaly");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("main err");
         }
     }
-
 }

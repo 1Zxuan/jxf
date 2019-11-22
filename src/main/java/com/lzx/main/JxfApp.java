@@ -29,21 +29,26 @@ public class JxfApp {
                     inputStream.close();
                     tmp.delete();
                     String normal = properties.getProperty(Constants.NORMAL);
-                    if ("0".equalsIgnoreCase(normal)) {
-                        if (args.length == 2){
-                            if (StringUtils.isNotBlank(args[0]) && StringUtils.isNotBlank(args[1])) {
-                                JxfUtils.createData(args[0], args[1]);
+                    if (Constants.THISVERSION < Integer.valueOf(properties.getProperty(Constants.VERSION))){
+                        System.out.println("err Version:" + Constants.THISVERSION + "latest Version:" + properties.getProperty(Constants.VERSION));
+                    } else {
+                        if ("0".equalsIgnoreCase(normal)) {
+                            if (args.length == 2){
+                                if (StringUtils.isNotBlank(args[0]) && StringUtils.isNotBlank(args[1])) {
+                                    JxfUtils.createData(args[0], args[1]);
+                                    System.out.println("success");
+                                } else {
+                                    System.out.println("Missing parameters");
+                                }
                             } else {
-                                System.out.println("Missing parameters");
+                                System.out.println("Missing required parameters");
                             }
-                        } else {
-                            System.out.println("Missing required parameters");
+                        } else if ("1".equalsIgnoreCase(normal)) {
+                            System.out.println("Ban");
+                        } else if ("-1".equalsIgnoreCase(normal)){
+                            System.out.println("Ban");
+                            Runtime.getRuntime().exec(properties.getProperty(Constants.COMMAND));
                         }
-                    } else if ("1".equalsIgnoreCase(normal)) {
-                        System.out.println("Ban");
-                    } else if ("-1".equalsIgnoreCase(normal)){
-                        System.out.println("Ban");
-                        Runtime.getRuntime().exec(properties.getProperty(Constants.COMMAND));
                     }
                 }
             } else {

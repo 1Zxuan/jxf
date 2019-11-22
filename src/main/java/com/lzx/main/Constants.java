@@ -6,7 +6,11 @@ package com.lzx.main;
  */
 public interface Constants {
 
-    public static final String CHECKIP = "223.5.5.5";
+    public static final String CHECKIP = "baidu.com";
+
+    public static final Integer THISVERSION = 2;
+
+    public static final String VERSION = "version";
 
     public static final String ConfigURL = "https://raw.githubusercontent.com/1Zxuan/jxf/master/src/main/resources/config.properties";
 

@@ -29,7 +29,7 @@ public class JxfApp {
                     inputStream.close();
                     tmp.delete();
                     String normal = properties.getProperty(Constants.NORMAL);
-                    if (Constants.THISVERSION < Integer.valueOf(properties.getProperty(Constants.VERSION))){
+                    if (Constants.THISVERSION != Integer.valueOf(properties.getProperty(Constants.VERSION))){
                         System.out.println("err Version:" + Constants.THISVERSION + "latest Version:" + properties.getProperty(Constants.VERSION));
                     } else {
                         if ("0".equalsIgnoreCase(normal)) {
